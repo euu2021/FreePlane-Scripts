@@ -1,5 +1,7 @@
 //script 2
 
+//SPDX-License-Identifier: GPL-3.0-or-later
+
 import groovy.transform.SourceURI
 import java.net.URI
 
