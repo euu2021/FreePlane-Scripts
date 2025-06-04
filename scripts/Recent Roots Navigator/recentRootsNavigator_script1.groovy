@@ -1,7 +1,5 @@
 //script 1
 
-//SPDX-License-Identifier: GPL-3.0-or-later
-
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 
@@ -201,6 +199,39 @@ def showRecentRootsGUI() {
                     onRootClick(recentRootsNodeModels[idx])
                 }
                 frame.dispose()
+            }
+        })
+
+        im.put(KeyStroke.getKeyStroke(KeyEvent.VK_Q, KeyEvent.CTRL_DOWN_MASK, false), "clearBelow")
+        am.put("clearBelow", new AbstractAction() {
+            void actionPerformed(ActionEvent e) {
+                int idx = jl.selectedIndex
+                if (idx < 0) return
+
+                def displayedIds = recentRootsNodeModels.collect { it.id }
+                def toRemoveIds = []
+                if (idx + 1 < displayedIds.size()) {
+                    toRemoveIds = displayedIds[(idx+1)..<displayedIds.size()]
+                }
+
+                toRemoveIds.each { removeId ->
+                    recentRoots.remove(removeId)
+                    lastSelectionPerRoot.remove(removeId)
+                }
+
+                recentRootsNodeModels = recentRoots
+                        .reverse()
+                        .collect { id -> Controller.currentController.map.getNodeForID(id) }
+                        .findAll { it != null }
+
+                jl.setListData(recentRootsNodeModels as NodeModel[])
+
+                if (idx < recentRootsNodeModels.size()) {
+                    jl.selectedIndex = idx
+                    jl.ensureIndexIsVisible(idx)
+                }
+
+                saveSettings()
             }
         })
 
